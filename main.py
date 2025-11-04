@@ -2,28 +2,21 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 import joblib
 
-# 1. Загружаем твою модель (делаем это 1 раз при старте)
-model = joblib.load('iris_model.joblib')
-scaler = joblib.load('scaler.joblib') # <-- ЗАГРУЖАЕМ SCALER
+model = joblib.load('iris_model.joblib') # загружаем файл модели и файл scaler
+scaler = joblib.load('scaler.joblib')
 
-app = FastAPI()
+app = FastAPI() # создаём веб объект
 
-SPECIES_NAMES = ['setosa', 'versicolor', 'virginica']
+SPECIES_NAMES = ['setosa', 'versicolor', 'virginica'] # также записываем названия видов
 
-# 2. ВОТ ОНО: Описываем, какие данные мы ждем
-# Названия должны совпадать с тем, на чем училась модель
-class IrisFeatures(BaseModel):
-    sepal_length: float  # sepal length (cm)
-    sepal_width: float   # sepal width (cm)
-    petal_length: float  # petal length (cm)
-    petal_width: float   # petal width (cm)
+class IrisFeatures(BaseModel): # через BaseModel описываем класс нужных нам данных на вход
+    sepal_length: float
+    sepal_width: float
+    petal_length: float
+    petal_width: float
 
-# 3. Создаем endpoint для ПРЕДСКАЗАНИЯ
-# Он будет доступен по адресу http://127.0.0.1:8000/predict
-@app.post("/predict")
-def predict_species(features: IrisFeatures):
-    # 4. Превращаем данные из Pydantic в список или 2D-массив,
-    # который "понимает" твоя scikit-learn модель
+@app.post("/predict") # создаём endpoint, адрес http://127.0.0.1:8000/predict
+def predict_species(features: IrisFeatures): # создаём список
     data_for_model = [
         [
             features.sepal_length,
@@ -33,19 +26,13 @@ def predict_species(features: IrisFeatures):
         ]
     ]
 
-    data_scaled = scaler.transform(data_for_model)
-    # 5. Делаем предсказание
+    data_scaled = scaler.transform(data_for_model) # нормализуем данные, потом предсказываем результат
     prediction_raw = model.predict(data_scaled)
 
-    # 6.
-    prediction_index = int(prediction_raw[0])
-
-    # 3. ИСПОЛЬЗУЕМ ИНДЕКС, ЧТОБЫ ПОЛУЧИТЬ ИМЯ
+    prediction_index = int(prediction_raw[0]) # получаем индекс и возвращаем имя, соответствующее индексу
     species_name = SPECIES_NAMES[prediction_index]
 
-
-    # 7. Возвращаем JSON-ответ
-    return {
+    return { # ответ
         "predicted_species": species_name,
         "predicted_species_id": prediction_index,
     }
