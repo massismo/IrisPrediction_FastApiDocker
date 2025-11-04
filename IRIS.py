@@ -38,7 +38,7 @@ X_test_scaled = scaler.transform(X_test)
 knn = KNeighborsClassifier(n_neighbors=5)
 logreg = LogisticRegression(max_iter=200, multi_class='auto')
 
-# 6. Обучение
+# 6. Обучени
 knn.fit(X_train_scaled, y_train)
 logreg.fit(X_train_scaled, y_train)
 
@@ -55,12 +55,6 @@ for name, model in [('k-NN', knn), ('LogisticRegression', logreg)]:
 scores = cross_val_score(knn, scaler.fit_transform(X), y, cv=5)
 print('\nk-NN 5-fold CV accuracy:', np.round(scores, 3), 'mean =', scores.mean())
 
-"""
-new_sample = np.array([[5.1, 3.5, 1.4, 0.2]])  # длина/ширина чашелистика, лепестка
-new_sample_scaled = scaler.transform(new_sample)
-pred = knn.predict(new_sample_scaled)
-print('\nPredicted species for', new_sample, '->', target_names[pred[0]])
-"""
 # 10. Визуализация (пара признаков)
 sns.pairplot(df, hue='species', vars=feature_names)
 plt.suptitle('Pairplot of Iris features', y=1.02)

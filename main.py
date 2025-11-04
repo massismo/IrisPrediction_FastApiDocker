@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
-import joblib # Не забудь импортировать
+import joblib
 
 # 1. Загружаем твою модель (делаем это 1 раз при старте)
 model = joblib.load('iris_model.joblib')
